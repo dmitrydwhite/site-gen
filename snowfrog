@@ -14,7 +14,7 @@ var rl = readline.createInterface({
 //   console.log(contents);
 // });
 
-new _.SnowForge(process.argv[2]);
+new _.SnowFrog(process.argv[2]);
 
 process.exit(0);
 
