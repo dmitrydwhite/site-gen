@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+
+var fs = require('fs');
+var readline = require('readline');
+var _ = require('./index');
+
+var rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+// fs.readFile(process.argv[2], { encoding: 'utf8' }, function (err, contents) {
+//   if (err) throw err;
+//   console.log(contents);
+// });
+
+new _.SnowForge(process.argv[2]);
+
+process.exit(0);
+
