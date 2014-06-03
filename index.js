@@ -8,8 +8,9 @@ var rfOptions = {encoding: 'utf-8'};
 var _ = require('lodash');
 
 /**
- * SnowFrog is a static-site generator that accepts a directory and
- * converts it into a directory with the new layout
+ *
+ * @function SnowFrog is a static-site generating function that accepts a
+ * directory and converts it into a directory with the new layout
  *
  * @param {string} path: a path for the file or file system that will be
  *                       the basis for the generated site.
@@ -20,9 +21,12 @@ var _ = require('lodash');
  */
 var SnowFrog = function (directory, indexFile) {
   var sourceObj = this._findDirectory(directory, indexFile);
-  sourceObj.webFiles = this.webList(sourceObj);
-  // console.log(sourceObj);
-  this.findCommon(sourceObj);
+  var commonLayout;
+  sourceObj.webFiles = this._webList(sourceObj);
+  this._extractTemplate(sourceObj.template);
+  if (commonLayout) {
+    console.log(commonLayout);
+  }
   return sourceObj;
 };
 
@@ -40,7 +44,7 @@ SnowFrog.prototype._findDirectory = function (directory, indexFile) {
   return readObject;
 };
 
-SnowFrog.prototype.webList = function (sourceDir) {
+SnowFrog.prototype._webList = function (sourceDir) {
   var files = fs.readdirSync(sourceDir.path);
   var webFiles = [];
   files.map(function (fileName) {
@@ -51,7 +55,7 @@ SnowFrog.prototype.webList = function (sourceDir) {
   return webFiles;
 };
 
-SnowFrog.prototype.findCommon = function (sourceDir) {
+SnowFrog.prototype._findCommon = function (sourceDir) {
   var filesList = sourceDir.webFiles;
   var commonText;
 
@@ -78,6 +82,14 @@ SnowFrog.prototype.findCommon = function (sourceDir) {
     fs.readFile(fileToCompare, "utf-8", function (err, data) {
       checkConstants(err, data);
     });
+  });
+};
+
+SnowFrog.prototype._extractTemplate = function (layoutFile) {
+  fs.readFile(layoutFile, "utf-8", function (err, content) {
+    var layoutArray = content.split("{{CONTENT}}");
+    commonLayout = layoutArray;
+    console.log(commonLayout);
   });
 };
 
