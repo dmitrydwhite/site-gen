@@ -4,7 +4,8 @@ var rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
-var rfOptions = {encoding: 'utf8'};
+var rfOptions = {encoding: 'utf-8'};
+var _ = require('lodash');
 
 /**
  * SnowFrog is a static-site generator that accepts a directory and
@@ -19,9 +20,10 @@ var rfOptions = {encoding: 'utf8'};
  */
 var SnowFrog = function (directory, indexFile) {
   var sourceObj = this._findDirectory(directory, indexFile);
-  console.log(this.webList(sourceObj));
-  return this.webList(sourceObj);
-  // return sourceObj;
+  sourceObj.webFiles = this.webList(sourceObj);
+  // console.log(sourceObj);
+  this.findCommon(sourceObj);
+  return sourceObj;
 };
 
 SnowFrog.prototype._findDirectory = function (directory, indexFile) {
@@ -33,7 +35,7 @@ SnowFrog.prototype._findDirectory = function (directory, indexFile) {
   if (!indexFile) {
     template = dr + "/layout.html";
   }
-  console.log("Template file is: " + template);
+  // console.log("Template file is: " + template);
   var readObject = {path: dr, template: template};
   return readObject;
 };
@@ -47,6 +49,36 @@ SnowFrog.prototype.webList = function (sourceDir) {
     }
   });
   return webFiles;
+};
+
+SnowFrog.prototype.findCommon = function (sourceDir) {
+  var filesList = sourceDir.webFiles;
+  var commonText;
+
+  var checkConstants = function (err, fileText) {
+    var contentString = fileText;
+
+      if (!commonText) {
+        commonText = fileText.split(" ");
+        // console.log(commonText);
+      }
+      if (_.difference(fileText.split(" "), commonText).length === 0) {
+        commonText = fileText.split(" ");
+        // console.log(commonText);
+      }
+      else {
+        commonText = _.intersection(commonText, fileText.split(" "));
+        // console.log(commonText);
+      }
+      console.log("Common text is " + commonText);
+  };
+
+  filesList.forEach(function (fileToCompare) {
+    console.log("Reading file " + fileToCompare);
+    fs.readFile(fileToCompare, "utf-8", function (err, data) {
+      checkConstants(err, data);
+    });
+  });
 };
 
 
