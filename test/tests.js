@@ -9,7 +9,7 @@ describe('site-generator', function () {
     expect(new SnowFrog(input)).
                 to.eql({path:'/Users/dmitrywhite/pcs/js_immersion/site-gen',
                 template:'/Users/dmitrywhite/pcs/js_immersion/site-gen/layout.html',
-                webFiles: ['layout.html', 'test.html']});
+                webFiles: ['layout.html', 'secondtest.html', 'test.html']});
   });
 
   it('recognizes all the files in the current directory', function () {
@@ -17,7 +17,7 @@ describe('site-generator', function () {
     expect(new SnowFrog(input)).
                 to.eql({path:'/Users/dmitrywhite/pcs/js_immersion/site-gen',
                 template:'/Users/dmitrywhite/pcs/js_immersion/site-gen/layout.html',
-                webFiles: ['layout.html', 'test.html']});
+                webFiles: ['layout.html', 'secondtest.html', 'test.html']});
   });
 
   it('creates an array of the .html files in the current directory', function () {
@@ -25,7 +25,7 @@ describe('site-generator', function () {
     expect(new SnowFrog(input)).
                 to.eql({path:'/Users/dmitrywhite/pcs/js_immersion/site-gen',
                 template:'/Users/dmitrywhite/pcs/js_immersion/site-gen/layout.html',
-                webFiles: ['layout.html', 'test.html']});
+                webFiles: ['layout.html', 'secondtest.html', 'test.html']});
   });
 
 });

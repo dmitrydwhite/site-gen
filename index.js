@@ -25,7 +25,6 @@ var SnowFrog = function (directory, indexFile) {
   sourceObj.webFiles = this._webList(sourceObj);
   this._extractTemplate(sourceObj.template);
   if (commonLayout) {
-    console.log(commonLayout);
   }
   return sourceObj;
 };
@@ -91,6 +90,15 @@ SnowFrog.prototype._extractTemplate = function (layoutFile) {
     commonLayout = layoutArray;
     console.log(commonLayout);
   });
+};
+
+SnowFrog.prototype._getOldContent = function (file) {
+  var oldContent;
+  fs.readFile(file, "utf-8", function (err, data) {
+    oldContent = data;
+    console.log("Extracting unique content from " + file);
+  });
+  if (oldContent) {return oldContent;}
 };
 
 
