@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 // var readline = require('readline');
-var SnowFrog = require('./index');
+var SnowFrog = require('./outdex');
 
 // var rl = readline.createInterface({
 //   input: process.stdin,
@@ -10,6 +10,4 @@ var SnowFrog = require('./index');
 // });
 
 new SnowFrog(process.argv[2]);
-
-process.exit(0);
 

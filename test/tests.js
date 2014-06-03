@@ -28,4 +28,12 @@ describe('site-generator', function () {
                 webFiles: ['layout.html', 'secondtest.html', 'test.html']});
   });
 
+  it('creates a copy of an existing file but with the new template', function () {
+    var input = ".";
+    expect(new SnowFrog(input)).
+                to.eql({path:'/Users/dmitrywhite/pcs/js_immersion/site-gen',
+                template:'/Users/dmitrywhite/pcs/js_immersion/site-gen/layout.html',
+                webFiles: ['layout.html', 'secondtest.html', 'test.html']});
+  });
+
 });

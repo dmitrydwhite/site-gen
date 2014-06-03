@@ -20,13 +20,16 @@ var _ = require('lodash');
  *                           assumes "layout.html"
  */
 var SnowFrog = function (directory, indexFile) {
-  var sourceObj = this._findDirectory(directory, indexFile);
-  var commonLayout;
-  sourceObj.webFiles = this._webList(sourceObj);
-  this._extractTemplate(sourceObj.template);
-  if (commonLayout) {
-  }
-  return sourceObj;
+  var snowObj = this._findDirectory(directory, indexFile);
+  this._startExtracting(snowObj, this._finishAll(snowObj));
+};
+
+SnowFrog.prototype._startExtracting = function (snowObj, fn) {
+  this._webList(snowObj);
+  this._extractTemplate(snowObj.template);
+  this._writeANewFile(snowObj.webFiles[0], snowObj.templateData);
+  fn(snowObj);
+
 };
 
 SnowFrog.prototype._findDirectory = function (directory, indexFile) {
@@ -47,11 +50,13 @@ SnowFrog.prototype._webList = function (sourceDir) {
   var files = fs.readdirSync(sourceDir.path);
   var webFiles = [];
   files.map(function (fileName) {
-    if (fileName.slice(-5) === ".html") {
-      webFiles.push(fileName);
+    if (fileName !== "layout.html") {
+      if (fileName.slice(-5) === ".html") {
+        webFiles.push(fileName);
+      }
     }
   });
-  return webFiles;
+  sourceDir.webFiles = webFiles;
 };
 
 SnowFrog.prototype._findCommon = function (sourceDir) {
@@ -87,8 +92,7 @@ SnowFrog.prototype._findCommon = function (sourceDir) {
 SnowFrog.prototype._extractTemplate = function (layoutFile) {
   fs.readFile(layoutFile, "utf-8", function (err, content) {
     var layoutArray = content.split("{{CONTENT}}");
-    commonLayout = layoutArray;
-    console.log(commonLayout);
+    snowObj.templateData = layoutArray;
   });
 };
 
@@ -99,6 +103,15 @@ SnowFrog.prototype._getOldContent = function (file) {
     console.log("Extracting unique content from " + file);
   });
   if (oldContent) {return oldContent;}
+};
+
+SnowFrog.prototype._writeANewFile = function (file, array) {
+  fs.readFile(file, "utf-8", function (err, data) {
+    fs.writeFile(path.normalize(directory + 'new' + file),
+      (array[0].toString + data + array[1]), "utf-8", function () {
+        console.log("Created New File");
+      });
+  });
 };
 
 
