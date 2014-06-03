@@ -1,11 +1,8 @@
 var readline = require('readline');
 var fs = require('fs');
-var rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
 var rfOptions = {encoding: 'utf-8'};
 var _ = require('lodash');
+var path = require('path');
 
 /**
  *
@@ -29,34 +26,33 @@ SnowFrog.prototype._startExtracting = function (snowObj, fn) {
   this._extractTemplate(snowObj.template);
   this._writeANewFile(snowObj.webFiles[0], snowObj.templateData);
   fn(snowObj);
-
+  this._findDirectory(directory, indexFile);
+  var sourceObj = this._findDirectory(directory, indexFile);
+  this._webList(sourceObj);
 };
+
 
 SnowFrog.prototype._findDirectory = function (directory, indexFile) {
   var template = indexFile;
-  var dr = directory;
-  if (directory === '.') {
-    dr = __dirname;
-  }
+  var dr = path.resolve(directory);
   if (!indexFile) {
-    template = dr + "/layout.html";
+    template = path.normalize(dr + "/layout.html");
   }
-  // console.log("Template file is: " + template);
+  console.log("Template file is: " + template);
   var readObject = {path: dr, template: template};
   return readObject;
 };
 
 SnowFrog.prototype._webList = function (sourceDir) {
-  var files = fs.readdirSync(sourceDir.path);
-  var webFiles = [];
-  files.map(function (fileName) {
-    if (fileName !== "layout.html") {
+  fs.readdir(sourceDir.path, function (err, files) {
+    var webFiles = [];
+    files.map(function (fileName) {
       if (fileName.slice(-5) === ".html") {
         webFiles.push(fileName);
       }
-    }
+    });
+  this._proceed(this._extractTemplate(indexFile));
   });
-  sourceDir.webFiles = webFiles;
 };
 
 SnowFrog.prototype._findCommon = function (sourceDir) {
@@ -92,7 +88,8 @@ SnowFrog.prototype._findCommon = function (sourceDir) {
 SnowFrog.prototype._extractTemplate = function (layoutFile) {
   fs.readFile(layoutFile, "utf-8", function (err, content) {
     var layoutArray = content.split("{{CONTENT}}");
-    snowObj.templateData = layoutArray;
+    console.log(layoutArray);
+    return layoutArray;
   });
 };
 

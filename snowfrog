@@ -1,13 +1,7 @@
 #!/usr/bin/env node
 
 var fs = require('fs');
-// var readline = require('readline');
-var SnowFrog = require('./outdex');
-
-// var rl = readline.createInterface({
-//   input: process.stdin,
-//   output: process.stdout
-// });
+var SnowFrog = require('./index');
 
 new SnowFrog(process.argv[2]);
 

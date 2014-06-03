@@ -16,7 +16,7 @@ describe('site-generator', function () {
     var input = ".";
     expect(new SnowFrog(input)).
                 to.eql({path:'/Users/dmitrywhite/pcs/js_immersion/site-gen',
-                template:'/Users/dmitrywhite/pcs/js_immersion/site-gen/layout.html',
+                template: '/Users/dmitrywhite/pcs/js_immersion/site-gen/layout.html',
                 webFiles: ['layout.html', 'secondtest.html', 'test.html']});
   });
 
@@ -24,7 +24,7 @@ describe('site-generator', function () {
     var input = ".";
     expect(new SnowFrog(input)).
                 to.eql({path:'/Users/dmitrywhite/pcs/js_immersion/site-gen',
-                template:'/Users/dmitrywhite/pcs/js_immersion/site-gen/layout.html',
+                template: '/Users/dmitrywhite/pcs/js_immersion/site-gen/layout.html',
                 webFiles: ['layout.html', 'secondtest.html', 'test.html']});
   });
 
