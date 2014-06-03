@@ -19,8 +19,9 @@ var rfOptions = {encoding: 'utf8'};
  */
 var SnowFrog = function (directory, indexFile) {
   var sourceObj = this._findDirectory(directory, indexFile);
-  console.log(this.directoryList(sourceObj));
-  return sourceObj;
+  console.log(this.webList(sourceObj));
+  return this.webList(sourceObj);
+  // return sourceObj;
 };
 
 SnowFrog.prototype._findDirectory = function (directory, indexFile) {
@@ -37,9 +38,15 @@ SnowFrog.prototype._findDirectory = function (directory, indexFile) {
   return readObject;
 };
 
-SnowFrog.prototype.directoryList = function (sourceDir) {
+SnowFrog.prototype.webList = function (sourceDir) {
   var files = fs.readdirSync(sourceDir.path);
-  return files;
+  var webFiles = [];
+  files.map(function (fileName) {
+    if (fileName.slice(-5) === ".html") {
+      webFiles.push(fileName);
+    }
+  });
+  return webFiles;
 };
 
 
