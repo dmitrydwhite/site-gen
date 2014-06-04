@@ -18,19 +18,22 @@ var path = require('path');
  */
 var SnowFrog = function (directory, indexFile) {
   var snowObj = this._findDirectory(directory, indexFile);
-  this._startExtracting(snowObj, this._finishAll(snowObj));
+  this._startFrogging(snowObj, this._finish(snowObj));
 };
 
-SnowFrog.prototype._startExtracting = function (snowObj, fn) {
-  this._webList(snowObj);
-  this._extractTemplate(snowObj.template);
-  this._writeANewFile(snowObj.webFiles[0], snowObj.templateData);
-  fn(snowObj);
-  this._findDirectory(directory, indexFile);
-  var sourceObj = this._findDirectory(directory, indexFile);
-  this._webList(sourceObj);
+SnowFrog.prototype._startFrogging = function (obj, cb) {
+  this._webList(obj, function (obj) {
+    this._extractTemplate(obj, function (obj) {
+      this._writeNewFiles(obj, function (obj) {
+
+      });
+    });
+  });
 };
 
+SnowFrog.prototype._finish = function (obj) {
+  return obj;
+};
 
 SnowFrog.prototype._findDirectory = function (directory, indexFile) {
   var template = indexFile;
@@ -43,54 +46,31 @@ SnowFrog.prototype._findDirectory = function (directory, indexFile) {
   return readObject;
 };
 
-SnowFrog.prototype._webList = function (sourceDir) {
-  fs.readdir(sourceDir.path, function (err, files) {
+SnowFrog.prototype._webList = function (obj, cb) {
+  console.log("beginning webList");
+  fs.readdir(obj.path, function (err, files) {
     var webFiles = [];
     files.map(function (fileName) {
-      if (fileName.slice(-5) === ".html") {
-        webFiles.push(fileName);
+      if (fileName !== "layout.html") {
+        if (fileName.slice(-5) === ".html") {
+          webFiles.push(fileName);
+        }
       }
-    });
-  this._proceed(this._extractTemplate(indexFile));
+      }.bind(this));
+    console.log(webFiles);
+    obj.webFiles = webFiles;
+    // console.log(obj);
   });
+  cb(obj);
+  return obj;
 };
 
-SnowFrog.prototype._findCommon = function (sourceDir) {
-  var filesList = sourceDir.webFiles;
-  var commonText;
-
-  var checkConstants = function (err, fileText) {
-    var contentString = fileText;
-
-      if (!commonText) {
-        commonText = fileText.split(" ");
-        // console.log(commonText);
-      }
-      if (_.difference(fileText.split(" "), commonText).length === 0) {
-        commonText = fileText.split(" ");
-        // console.log(commonText);
-      }
-      else {
-        commonText = _.intersection(commonText, fileText.split(" "));
-        // console.log(commonText);
-      }
-      console.log("Common text is " + commonText);
-  };
-
-  filesList.forEach(function (fileToCompare) {
-    console.log("Reading file " + fileToCompare);
-    fs.readFile(fileToCompare, "utf-8", function (err, data) {
-      checkConstants(err, data);
-    });
-  });
-};
-
-SnowFrog.prototype._extractTemplate = function (layoutFile) {
-  fs.readFile(layoutFile, "utf-8", function (err, content) {
+SnowFrog.prototype._extractTemplate = function (obj, cb) {
+  console.log("beginning template extraction");
+  fs.readFile(obj.template, "utf-8", function (err, content) {
     var layoutArray = content.split("{{CONTENT}}");
-    console.log(layoutArray);
-    return layoutArray;
-  });
+    obj.templateData = layoutArray;
+  }.bind(this));
 };
 
 SnowFrog.prototype._getOldContent = function (file) {
@@ -102,12 +82,14 @@ SnowFrog.prototype._getOldContent = function (file) {
   if (oldContent) {return oldContent;}
 };
 
-SnowFrog.prototype._writeANewFile = function (file, array) {
-  fs.readFile(file, "utf-8", function (err, data) {
-    fs.writeFile(path.normalize(directory + 'new' + file),
+SnowFrog.prototype._writeNewFiles = function (obj) {
+  obj.webFiles.forEach(function(file) {
+    fs.readFile(file, "utf-8", function (err, data) {
+    fs.writeFile(path.normalize(snowObj.path + 'new' + file),
       (array[0].toString + data + array[1]), "utf-8", function () {
-        console.log("Created New File");
+        console.log("Created New File: new" + file);
       });
+    }.bind(this));
   });
 };
 
