@@ -18,52 +18,56 @@ var path = require('path');
  *                           If no template file is specified, the program
  *                           assumes "layout.html"
  */
-var SnowFrog = function (directory, indexFile, cb) {
+var SnowFrog = function (directory, indexFile, destPath, cb) {
   //TODO Make error compatible
-  debugger;
-  var obj = this._findDirectory(directory, indexFile);
+  var obj = this._buildFrogObject(directory, indexFile);
   obj._cb = cb;
-  this._webList(obj);
+  this._listWebFiles(obj);
 };
 
 SnowFrog.prototype._finish = function (obj) {
-  console.log("finishing");
-  obj._cb(null, obj);
+  console.log("Finishing....%>");
+  if (obj._cb) {obj._cb(null, obj);}
 };
 
-SnowFrog.prototype._findDirectory = function (directory, indexFile) {
+SnowFrog.prototype._buildFrogObject = function (directory, indexFile, destPath) {
   var template = indexFile;
   var dr = path.resolve(directory);
   if (!indexFile) {
-    template = path.normalize(dr + "/layout.html");
+    template = "layout.html";
   }
   console.log("Template file is: " + template);
-  var obj = {path: dr, template: template};
+  var destination = destPath;
+  if (!destPath) {
+    destination = '/sfsite/';
+  }
+  console.log("Frogging into directory: " + destination);
+  var obj = {path: dr, template: template, dest: destination};
   return obj;
 };
 
-SnowFrog.prototype._webList = function (obj) {
-  console.log("beginning webList");
+SnowFrog.prototype._listWebFiles = function (obj) {
+  console.log("Identifying web files ##");
   fs.readdir(obj.path, function (err, files) {
     var webFiles = [];
     files.map(function (fileName) {
-      if (fileName !== "layout.html" && fileName.slice(-5) === ".html") {
+      if (fileName !== obj.template && fileName.slice(-5) === ".html") {
           webFiles.push(fileName);
+          console.log("%> ");
       }
       }.bind(this));
     obj.webFiles = webFiles;
-    console.log(obj.webFiles);
     this._extractTemplate(obj);
     }.bind(this));
 };
 
 SnowFrog.prototype._extractTemplate = function (obj) {
-  console.log("beginning template extraction");
+  console.log("Beginning template extraction ##");
   console.log(obj.template);
   fs.readFile(obj.template, "utf-8", function (err, content) {
     var layoutArray = content.split("{{CONTENT}}");
     obj.templateData = layoutArray;
-    console.log(layoutArray);
+    console.log("%> Template extracted ##");
     this._getOldContent(obj);
   }.bind(this));
 };
@@ -75,22 +79,31 @@ SnowFrog.prototype._getOldContent = function (obj) {
     fs.readFile(file, "utf-8", function (err, data) {
       console.log("Extracted unique content from " + file);
       obj.webContent[index] = data;
+      console.log("%> ");
       counter += 1;
       if (counter === obj.webFiles.length) {
-        this._writeNewFiles(obj);
+        this._frogTheNewPath(obj);
       }
   }.bind(this));
   }, this);
 };
 
+SnowFrog.prototype._frogTheNewPath = function (obj) {
+  fs.mkdir(path.resolve(obj.path + '/' + obj.dest + '/'), function (err) {
+    if (err) {throw err;}
+    this._writeNewFiles(obj);
+  }.bind(this));
+};
+
 SnowFrog.prototype._writeNewFiles = function (obj) {
-  console.log("beginning to write new files");
+  console.log("%> Beginning to write new files ##");
   var counter = 0;
   obj.webFiles.forEach(function (file, index) {
-    fs.writeFile(path.normalize(obj.path + '/' + 'new' + file),
+    fs.writeFile(path.normalize(obj.path +
+      '/' + obj.dest + '/' + 'frogged_' + file),
     (obj.templateData[0] + obj.webContent[index] +
       obj.templateData[1]), "utf-8", function () {
-        console.log("Created New File: new" + obj.webFiles[0]);
+        console.log("%> Created New File: frogged_" + obj.webFiles[0] + " ##");
         counter += 1;
         if (counter === obj.webFiles.length) {
           this._finish(obj);
@@ -98,8 +111,5 @@ SnowFrog.prototype._writeNewFiles = function (obj) {
     }.bind(this));
   }, this);
 };
-
-
-
 
 module.exports = SnowFrog;
