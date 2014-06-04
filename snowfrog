@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-var fs = require('fs');
 var SnowFrog = require('./index');
 
-new SnowFrog(process.argv[2]);
+new SnowFrog(process.argv[2], process.argv[3], process.argv[4]);
 
