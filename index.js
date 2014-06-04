@@ -19,7 +19,6 @@ var path = require('path');
  *                           assumes "layout.html"
  */
 var SnowFrog = function (directory, indexFile, destPath, cb) {
-  //TODO Make error compatible
   var obj = this._buildFrogObject(directory, indexFile);
   obj._cb = cb;
   this._listWebFiles(obj);
@@ -49,6 +48,7 @@ SnowFrog.prototype._buildFrogObject = function (directory, indexFile, destPath) 
 SnowFrog.prototype._listWebFiles = function (obj) {
   console.log("Identifying web files ##");
   fs.readdir(obj.path, function (err, files) {
+    if (err) {return obj._cb(err);}
     var webFiles = [];
     files.map(function (fileName) {
       if (fileName !== obj.template && fileName.slice(-5) === ".html") {
@@ -65,6 +65,7 @@ SnowFrog.prototype._extractTemplate = function (obj) {
   console.log("Beginning template extraction ##");
   console.log(obj.template);
   fs.readFile(obj.template, "utf-8", function (err, content) {
+    if (err) {return obj._cb(err);}
     var layoutArray = content.split("{{CONTENT}}");
     obj.templateData = layoutArray;
     console.log("%> Template extracted ##");
@@ -77,6 +78,7 @@ SnowFrog.prototype._getOldContent = function (obj) {
   obj.webContent = [];
   obj.webFiles.forEach(function (file, index) {
     fs.readFile(file, "utf-8", function (err, data) {
+      if (err) {return obj._cb(err);}
       console.log("Extracted unique content from " + file);
       obj.webContent[index] = data;
       console.log("%> ");
@@ -102,7 +104,8 @@ SnowFrog.prototype._writeNewFiles = function (obj) {
     fs.writeFile(path.normalize(obj.path +
       '/' + obj.dest + '/' + 'frogged_' + file),
     (obj.templateData[0] + obj.webContent[index] +
-      obj.templateData[1]), "utf-8", function () {
+      obj.templateData[1]), "utf-8", function (err) {
+      if (err) {return obj._cb(err);}
         console.log("%> Created New File: frogged_" + obj.webFiles[0] + " ##");
         counter += 1;
         if (counter === obj.webFiles.length) {
