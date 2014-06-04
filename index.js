@@ -1,3 +1,5 @@
+'use strict';
+
 var readline = require('readline');
 var fs = require('fs');
 var rfOptions = {encoding: 'utf-8'};
@@ -16,23 +18,20 @@ var path = require('path');
  *                           If no template file is specified, the program
  *                           assumes "layout.html"
  */
-var SnowFrog = function (directory, indexFile) {
-  var snowObj = this._findDirectory(directory, indexFile);
-  this._startFrogging(snowObj, this._finish(snowObj));
+var SnowFrog = function (directory, indexFile, cb) {
+  debugger;
+  var obj = this._findDirectory(directory, indexFile);
+  obj._cb = cb;
+  this._webList(obj);
 };
 
 SnowFrog.prototype._startFrogging = function (obj, cb) {
-  this._webList(obj, function (obj) {
-    this._extractTemplate(obj, function (obj) {
-      this._writeNewFiles(obj, function (obj) {
-
-      });
-    });
-  });
+  console.log("beginning frogging");
 };
 
 SnowFrog.prototype._finish = function (obj) {
-  return obj;
+  console.log("finishing");
+  obj._cb(null, obj);
 };
 
 SnowFrog.prototype._findDirectory = function (directory, indexFile) {
@@ -42,11 +41,11 @@ SnowFrog.prototype._findDirectory = function (directory, indexFile) {
     template = path.normalize(dr + "/layout.html");
   }
   console.log("Template file is: " + template);
-  var readObject = {path: dr, template: template};
-  return readObject;
+  var obj = {path: dr, template: template};
+  return obj;
 };
 
-SnowFrog.prototype._webList = function (obj, cb) {
+SnowFrog.prototype._webList = function (obj) {
   console.log("beginning webList");
   fs.readdir(obj.path, function (err, files) {
     var webFiles = [];
@@ -57,40 +56,61 @@ SnowFrog.prototype._webList = function (obj, cb) {
         }
       }
       }.bind(this));
-    console.log(webFiles);
     obj.webFiles = webFiles;
-    // console.log(obj);
-  });
-  cb(obj);
-  return obj;
+    console.log(obj.webFiles);
+    this._extractTemplate(obj);
+    }.bind(this));
 };
 
-SnowFrog.prototype._extractTemplate = function (obj, cb) {
+SnowFrog.prototype._extractTemplate = function (obj) {
   console.log("beginning template extraction");
+  console.log(obj.template);
   fs.readFile(obj.template, "utf-8", function (err, content) {
     var layoutArray = content.split("{{CONTENT}}");
     obj.templateData = layoutArray;
+    console.log(layoutArray);
+    this._getOldContent(obj);
   }.bind(this));
 };
 
-SnowFrog.prototype._getOldContent = function (file) {
-  var oldContent;
-  fs.readFile(file, "utf-8", function (err, data) {
-    oldContent = data;
-    console.log("Extracting unique content from " + file);
-  });
-  if (oldContent) {return oldContent;}
+SnowFrog.prototype._getOldContent = function (obj) {
+  fs.readFile(obj.webFiles[0], "utf-8", function (err, data) {
+    console.log("Extracting unique content from " + obj.webFiles[0]);
+    obj.webContent = data;
+    this._writeNewFiles(obj);
+  }.bind(this));
 };
 
 SnowFrog.prototype._writeNewFiles = function (obj) {
-  obj.webFiles.forEach(function(file) {
-    fs.readFile(file, "utf-8", function (err, data) {
-    fs.writeFile(path.normalize(snowObj.path + 'new' + file),
-      (array[0].toString + data + array[1]), "utf-8", function () {
-        console.log("Created New File: new" + file);
-      });
+  console.log("beginning to write new files");
+  fs.writeFile(path.normalize(obj.path + '/' + 'new' + obj.webFiles[0]),
+  (obj.templateData[0] + obj.webContent +
+    obj.templateData[1]), "utf-8", function () {
+      console.log("Created New File: new" + obj.webFiles[0]);
+      this._finish(obj);
     }.bind(this));
-  });
+};
+  // obj.webFiles.forEach(function(file) {
+  //   fs.readFile(file, "utf-8", function (err, data) {
+  //     console.log("Cloning " + file);
+  //     fs.writeFile(path.normalize(obj.path + 'new' + file),
+  //       (obj.templateData[0].toString + data +
+  //         obj.templateData[1]), "utf-8", function () {
+  //         console.log("Created New File: new" + file);
+  //       });
+  //   }.bind(this));
+  // }, this);
+
+
+SnowFrog.prototype._eachFile = function (err, data, obj, count) {
+  console.log("Cloning " + obj.webFiles[i]);
+  fs.writeFile(path.normalize(obj.path + '/' + 'new' + obj.webFiles[count]),
+    (obj.templateData[0].toString + data +
+      obj.templateData[1]), "utf-8", function () {
+        console.log("Created New File: new" + obj.webFiles[count]);
+        count += 1;
+        return count;
+      });
 };
 
 
