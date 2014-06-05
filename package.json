@@ -32,5 +32,9 @@
     "lodash": "^2.4.1",
     "path": "^0.4.9",
     "readline": "0.0.3"
+  },
+  "dependencies": {
+    "fs": "0.0.1",
+    "readline": "0.0.3"
   }
 }
