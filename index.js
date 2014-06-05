@@ -5,6 +5,10 @@ var fs = require('fs');
 var rfOptions = {encoding: 'utf-8'};
 var _ = require('lodash');
 var path = require('path');
+var rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
 /**
  *
@@ -51,14 +55,37 @@ SnowFrog.prototype._listWebFiles = function (obj) {
     if (err) {return obj._cb(err);}
     var webFiles = [];
     files.map(function (fileName) {
+      var css = false;
       if (fileName !== obj.template && fileName.slice(-5) === ".html") {
           webFiles.push(fileName);
           console.log("%> ");
+      }
+      if (fileName.slice(-4) === css) {
+        obj.sylesheet = fileName;
+        css = true;}
+      if (css === false) {
+        console.log("SnowFrog did not locate a .css stylesheet " +
+                    "in the source directory.  ");
+        rl.question("Where is your .css stylesheet for this page located?",
+          function (stylePath) {
+            this._locateStylesheet(obj, stylePath);
+          }.bind(this));
       }
       }.bind(this));
     obj.webFiles = webFiles;
     this._extractTemplate(obj);
     }.bind(this));
+};
+
+SnowFrog.prototype._locateStylesheet = function (obj, path) {
+  fs.readdir(path.resolve(obj.path, path), function (err, files) {
+    if (err) {return obj._cb(err);}
+    files.forEach(function (fileName) {
+      if (fileName.slice(-4) === '.css') {
+        obj.stylesheet = fileName;
+      }
+    }, this);
+  }.bind(this));
 };
 
 SnowFrog.prototype._extractTemplate = function (obj) {
