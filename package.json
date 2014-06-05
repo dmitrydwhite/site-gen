@@ -1,0 +1,36 @@
+{
+  "name": "snowfrog",
+  "version": "0.0.1",
+  "description": "SnowFrog site generator",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "bin": {
+    "sonwfrog": "./bin/snowfrog"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dmitrydwhite/snowfrog.git"
+  },
+  "keywords": [
+    "static",
+    "site",
+    "generator"
+  ],
+  "author": "Dmitry White",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dmitrydwhite/snowfrog/issues"
+  },
+  "homepage": "https://github.com/dmitrydwhite/snowfrog",
+  "devDependencies": {
+    "fs": "0.0.1",
+    "lodash": "^2.4.1",
+    "path": "^0.4.9",
+    "readline": "0.0.3"
+  }
+}
