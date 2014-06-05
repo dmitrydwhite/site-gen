@@ -28,6 +28,8 @@
   },
   "homepage": "https://github.com/dmitrydwhite/snowfrog",
   "devDependencies": {
+    "coveralls": "^2.10.0",
+    "istanbul": "^0.2.10",
     "fs": "0.0.1",
     "lodash": "^2.4.1",
     "path": "^0.4.9",
