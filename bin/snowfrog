@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var SnowFrog = require('./index');
+var SnowFrog = require('../lib/index');
 
 new SnowFrog(process.argv[2], process.argv[3], process.argv[4]);
 
