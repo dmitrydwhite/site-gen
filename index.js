@@ -24,13 +24,14 @@ var rl = readline.createInterface({
  */
 var SnowFrog = function (directory, indexFile, destPath, cb) {
   var obj = this._buildFrogObject(directory, indexFile);
-  obj._cb = cb;
+  // obj._cb = cb;
   this._listWebFiles(obj);
 };
 
 SnowFrog.prototype._finish = function (obj) {
   console.log("Finishing....%>");
   if (obj._cb) {obj._cb(null, obj);}
+  process.exit(0);
 };
 
 SnowFrog.prototype._buildFrogObject = function (directory, indexFile, destPath) {
@@ -54,27 +55,25 @@ SnowFrog.prototype._listWebFiles = function (obj) {
   fs.readdir(obj.path, function (err, files) {
     if (err) {return obj._cb(err);}
     var webFiles = [];
+    var sSheets = [];
+    var css = false;
     files.map(function (fileName) {
-      var css = false;
       if (fileName !== obj.template && fileName.slice(-5) === ".html") {
           webFiles.push(fileName);
           console.log("%> ");
       }
-      if (fileName.slice(-4) === css) {
-        obj.sylesheet = fileName;
-        css = true;}
-      if (css === false) {
-        console.log("SnowFrog did not locate a .css stylesheet " +
-                    "in the source directory.  ");
-        rl.question("Where is your .css stylesheet for this page located?",
-          function (stylePath) {
-            this._locateStylesheet(obj, stylePath);
-          }.bind(this));
+      if (fileName.slice(-4) === '.css') {
+        obj.stylesheet.push(fileName);
+        css = true;
       }
-      }.bind(this));
+    }.bind(this));
+    if (css === false) {
+      console.log("SnowFrog did not locate a .css stylesheet " +
+                  "in the source directory.  ##");
+    }
     obj.webFiles = webFiles;
     this._extractTemplate(obj);
-    }.bind(this));
+  }.bind(this));
 };
 
 SnowFrog.prototype._locateStylesheet = function (obj, path) {
@@ -90,7 +89,6 @@ SnowFrog.prototype._locateStylesheet = function (obj, path) {
 
 SnowFrog.prototype._extractTemplate = function (obj) {
   console.log("Beginning template extraction ##");
-  console.log(obj.template);
   fs.readFile(obj.template, "utf-8", function (err, content) {
     if (err) {return obj._cb(err);}
     var layoutArray = content.split("{{CONTENT}}");
@@ -133,7 +131,7 @@ SnowFrog.prototype._writeNewFiles = function (obj) {
     (obj.templateData[0] + obj.webContent[index] +
       obj.templateData[1]), "utf-8", function (err) {
       if (err) {return obj._cb(err);}
-        console.log("%> Created New File: frogged_" + obj.webFiles[0] + " ##");
+        console.log("%> Created New File: frogged_" + file + " ##");
         counter += 1;
         if (counter === obj.webFiles.length) {
           this._finish(obj);
@@ -142,4 +140,23 @@ SnowFrog.prototype._writeNewFiles = function (obj) {
   }, this);
 };
 
-module.exports = SnowFrog;
+SnowFrog.prototype._includeCSS = function (obj) {
+  if (obj.stylesheet) {
+    var counter = 0;
+    obj.stylesheet.forEach(function (file) {
+      fs.readFile(file, "utf-8", function (err, data) {
+        fs.writeFile(path.normalize(obj.path +
+          '/' + obj.dest + '/' + 'frogged_' + file),data, function (err) {
+            console.log("%> Copied .css stylesheet: frogged_" + file + " ##");
+            counter += 1;
+            if (counter === obj.stylesheet.length) {
+              this._finish(obj);
+            }
+        }.bind(this));
+      }.bind(this));
+    },this);
+  }
+  else {
+    this.finishfilele.exports = SnowFrog;
+  }
+};
