@@ -24,7 +24,7 @@ var rl = readline.createInterface({
  */
 var SnowFrog = function (directory, indexFile, destPath, cb) {
   var obj = this._buildFrogObject(directory, indexFile);
-  // obj._cb = cb;
+  obj._cb = cb;
   this._listWebFiles(obj);
 };
 
@@ -46,7 +46,7 @@ SnowFrog.prototype._buildFrogObject = function (directory, indexFile, destPath) 
     destination = '/sfsite/';
   }
   console.log("Frogging into directory: " + destination);
-  var obj = {path: dr, template: template, dest: destination};
+  var obj = {path: dr, template: path.resolve(dr + "/" + template), dest: destination};
   return obj;
 };
 
@@ -63,7 +63,7 @@ SnowFrog.prototype._listWebFiles = function (obj) {
           console.log("%> ");
       }
       if (fileName.slice(-4) === '.css') {
-        obj.stylesheet.push(fileName);
+        sSheets.push(fileName);
         css = true;
       }
     }.bind(this));
@@ -71,6 +71,7 @@ SnowFrog.prototype._listWebFiles = function (obj) {
       console.log("SnowFrog did not locate a .css stylesheet " +
                   "in the source directory.  ##");
     }
+    if (css === true) {obj.stylesheet = sSheets;}
     obj.webFiles = webFiles;
     this._extractTemplate(obj);
   }.bind(this));
@@ -90,7 +91,7 @@ SnowFrog.prototype._locateStylesheet = function (obj, path) {
 SnowFrog.prototype._extractTemplate = function (obj) {
   console.log("Beginning template extraction ##");
   fs.readFile(obj.template, "utf-8", function (err, content) {
-    if (err) {return obj._cb(err);}
+    if (err) {throw err;}
     var layoutArray = content.split("{{CONTENT}}");
     obj.templateData = layoutArray;
     console.log("%> Template extracted ##");
@@ -102,8 +103,8 @@ SnowFrog.prototype._getOldContent = function (obj) {
   var counter = 0;
   obj.webContent = [];
   obj.webFiles.forEach(function (file, index) {
-    fs.readFile(file, "utf-8", function (err, data) {
-      if (err) {return obj._cb(err);}
+    fs.readFile(path.resolve(obj.path + '/' + file), "utf-8", function (err, data) {
+      if (err) {throw err;}
       console.log("Extracted unique content from " + file);
       obj.webContent[index] = data;
       console.log("%> ");
@@ -134,7 +135,7 @@ SnowFrog.prototype._writeNewFiles = function (obj) {
         console.log("%> Created New File: frogged_" + file + " ##");
         counter += 1;
         if (counter === obj.webFiles.length) {
-          this._finish(obj);
+          this._includeCSS(obj);
         }
     }.bind(this));
   }, this);
@@ -157,6 +158,8 @@ SnowFrog.prototype._includeCSS = function (obj) {
     },this);
   }
   else {
-    this.finishfilele.exports = SnowFrog;
+    this.finish(obj);
   }
 };
+
+module.exports = SnowFrog;

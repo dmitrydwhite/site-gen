@@ -2,7 +2,5 @@
 
 var SnowFrog = require('./index');
 
-
-console.log(process.argv);
 new SnowFrog(process.argv[2], process.argv[3], process.argv[4]);
 
