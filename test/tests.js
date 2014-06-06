@@ -1,10 +1,10 @@
-var SnowFrog = require('../index');
+var SnowFrog = require('../lib/index');
 var chai = require('chai');
 var expect = chai.expect;
 
 describe('site-generator', function () {
 
-  it.skip('can locate the current directory', function (done) {
+  it('can locate the current directory', function (done) {
     var input = ".";
     new SnowFrog(input, "", function(err, result) {
       expect(result).
